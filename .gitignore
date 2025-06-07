@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.env
+secrets.toml
+streamlit_secrets.toml
+*.pt
+*.csv
+*.tsv
+dataset/
+Community Detection on OGBN-Arxiv.ipynb
+backup_*
+siamese_*
+train_*
+triplet_*
