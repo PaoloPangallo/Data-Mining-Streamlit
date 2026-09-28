@@ -1,3 +1,4 @@
+# Python
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -6,6 +7,7 @@ venv/
 
 # Secrets
 .env
+.streamlit/secrets.toml
 secrets.toml
 streamlit_secrets.toml
 
@@ -14,19 +16,23 @@ streamlit_secrets.toml
 .vscode/
 .ipynb_checkpoints/
 
-# Generated models / data
-*.pt
+# Generated datasets / embeddings / models
+data/*.csv
+!data/README.md
+checkpoints/*.pt
+checkpoints/*.pth
+!checkpoints/README.md
+*.npy
+*.npz
 *.pth
-*.csv
-*.tsv
+*.pt
+*.json
+*.pdf
+*.html
+
+# Experiment output
 run_log.txt
 backup_*
 dataset/
-
-# Experiment-specific generated data
-siamese_*
-train_*
-triplet_*
-
-# Large source notebook intentionally excluded
-Community Detection on OGBN-Arxiv.ipynb
+xgboost_results/
+lib/

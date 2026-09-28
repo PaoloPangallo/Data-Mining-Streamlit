@@ -1,6 +1,7 @@
 import ast
 import re
 import string
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -15,9 +16,10 @@ from streamlit.runtime.scriptrunner import RerunException
 
 # ====================================
 st.set_page_config(page_title="Raccomandazioni Paper", layout="wide")
-st.sidebar.subheader("🛠 DEBUG OAUTH")
-st.sidebar.write("🔁 query_params", st.query_params)
-st.sidebar.write("📦 session_state", dict(st.session_state))
+
+BASE_DIR = Path(__file__).resolve().parent
+DATA_PATH = BASE_DIR / "data" / "df_final3.csv"
+EMBEDDINGS_PATH = BASE_DIR / "checkpoints" / "deepgcn_node_embeddings.pt"
 
 # ✅ INIZIALIZZA SUBITO I SEGRETI
 GH            = st.secrets["github"]
@@ -48,11 +50,6 @@ if st.session_state.auth_url is None:
 # === 1) CALLBACK: se arriva il codice da GitHub ===
 if "code" in st.query_params and "access_token" not in st.session_state:
     try:
-        st.sidebar.write("📤 fetch_token input", {
-            "code": st.query_params["code"],
-            "state": st.session_state.oauth_state
-        })
-
         oauth = OAuth2Session(CLIENT_ID, CLIENT_SECRET, redirect_uri=REDIRECT_URI, state=st.session_state.oauth_state)
         token = oauth.fetch_token(
             TOKEN_URL,
@@ -80,7 +77,6 @@ elif "access_token" not in st.session_state:
 
     if st.session_state.auth_url:  # ✅ solo se è valido
         st.markdown(f"[🔐 Login con GitHub]({st.session_state.auth_url})", unsafe_allow_html=True)
-        st.sidebar.write("DEBUG auth_url:", st.session_state.auth_url)
     else:
         st.warning("⚠️ auth_url non inizializzato correttamente.")
 
@@ -100,9 +96,6 @@ if "access_token" in st.session_state:
         CLIENT_SECRET,
         token={"access_token": st.session_state.access_token}
     )
-    user = oauth_sess.get("https://api.github.com/user").json()
-    st.sidebar.write("👤 GitHub user info", user)
-
     try:
         user = oauth_sess.get("https://api.github.com/user").json()
         col2.image(user.get("avatar_url", ""), width=40)
@@ -115,7 +108,7 @@ if "access_token" in st.session_state:
             st.markdown(f"**[{user.get('login')}]({user.get('html_url')})**", unsafe_allow_html=True)
             st.markdown("---")
 
-    except:
+    except Exception:
         col2.error("GitHub user fetch failed")
 
 
@@ -167,13 +160,13 @@ if st.session_state.dark_mode:
 # 8) CARICAMENTO E CACHE DEI DATI
 # ====================================
 @st.cache_data(show_spinner=False)
-def load_embeddings(path="checkpoints/deepgcn_node_embeddings.pt") -> np.ndarray:
-    embs = torch.load(path)
+def load_embeddings(path: Path = EMBEDDINGS_PATH) -> np.ndarray:
+    embs = torch.load(path, map_location="cpu", weights_only=True)
     embs = embs / embs.norm(dim=1, keepdim=True)
     return embs.numpy()
 
 @st.cache_data(show_spinner=False)
-def load_dataframe(path="df_final3.csv") -> pd.DataFrame:
+def load_dataframe(path: Path = DATA_PATH) -> pd.DataFrame:
     df = pd.read_csv(path).drop_duplicates("Title").reset_index(drop=True)
     # Publication Year
     if "Publication_Date" in df.columns:
@@ -218,8 +211,17 @@ def load_dataframe(path="df_final3.csv") -> pd.DataFrame:
         df["Institutions_List"] = df["Institutions"].apply(clean_insts)
     return df
 
+missing_assets = [path for path in (DATA_PATH, EMBEDDINGS_PATH) if not path.exists()]
+if missing_assets:
+    st.error(
+        "Required runtime artifacts are missing: "
+        + ", ".join(str(path.relative_to(BASE_DIR)) for path in missing_assets)
+    )
+    st.info("See data/README.md and checkpoints/README.md for the expected files.")
+    st.stop()
+
 embeddings_np = load_embeddings()
-df_final      = load_dataframe()
+df_final = load_dataframe()
 node_idx_list = df_final["node_idx"].tolist()
 
 # Build lookups
