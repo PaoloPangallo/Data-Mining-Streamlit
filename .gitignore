@@ -2,15 +2,31 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 .venv/
+venv/
+
+# Secrets
 .env
 secrets.toml
 streamlit_secrets.toml
+
+# IDE / notebooks
+.idea/
+.vscode/
+.ipynb_checkpoints/
+
+# Generated models / data
 *.pt
+*.pth
 *.csv
 *.tsv
-dataset/
-Community Detection on OGBN-Arxiv.ipynb
+run_log.txt
 backup_*
+dataset/
+
+# Experiment-specific generated data
 siamese_*
 train_*
 triplet_*
+
+# Large source notebook intentionally excluded
+Community Detection on OGBN-Arxiv.ipynb

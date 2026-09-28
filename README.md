@@ -91,7 +91,12 @@ pip install -r requirements.txt
 streamlit run streamlit_app.py
 ```
 
-The application expects the trained embedding/checkpoint artifacts and dataset files referenced by the project to be available locally. GitHub OAuth credentials are configured through Streamlit secrets.
+The application expects two local artifacts that are intentionally not committed because of their size/data role:
+
+- `df_final3.csv`
+- `checkpoints/deepgcn_node_embeddings.pt`
+
+Place them at those paths before launching the app. GitHub OAuth credentials are configured through Streamlit secrets and must not be committed.
 
 ## Repository contents
 
