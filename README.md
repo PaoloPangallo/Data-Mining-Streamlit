@@ -4,6 +4,15 @@
 
 This project studies scientific-paper recommendation by combining graph representations, learned node embeddings and bibliographic metadata. It includes exploratory data mining, classical machine-learning baselines, Graph Neural Network experiments and an interactive Streamlit application.
 
+**Motivation:** paper relevance is not captured by title keywords alone. Citation-network proximity can reveal relationships between publications, while bibliographic attributes provide interpretable ways to adapt recommendations. The project explores **how to combine learned graph-based similarity with metadata-aware ranking**.
+
+### Architecture and project walkthrough
+
+- [System design — offline graph experiments, online recommendation, two Mermaid diagrams and technical decisions](docs/SYSTEM_DESIGN.md)
+- [Guida italiana — problema affrontato, spiegazione semplice e preparazione al colloquio](docs/PROJECT_WALKTHROUGH_IT.md)
+
+**Important boundary:** GNN/model experiments run **offline**. Streamlit loads a **precomputed node-embedding tensor** and a metadata table; no GNN training or message passing happens during an interactive title search.
+
 ## What the project explores
 
 The experimental workflow compares several approaches:
@@ -35,19 +44,19 @@ Metadata-aware re-ranking
 Interactive recommendations
 ```
 
-Ranking can incorporate publication category, shared authors, PageRank, citation thresholds and scientific concepts.
+The **additive score** is cosine similarity + configurable same-category bonus + shared-author bonus + PageRank contribution. Citation thresholds and scientific concepts act as **filters**, not direct score terms.
 
 ## Interactive application
 
 The Streamlit application is implemented in `streamlit_app.py` and provides:
 
-- GitHub OAuth login;
+- GitHub OAuth identity integration (prototype; recommendations are not fully authorization-gated);
 - exact and fuzzy title search;
 - embedding-based similarity;
 - configurable ranking weights;
 - metadata filters;
 - recommendation cards;
-- favourites;
+- session-only favourites (not persisted in a user database);
 - CSV export.
 
 OAuth credentials are read from Streamlit secrets and are never committed.
@@ -112,10 +121,12 @@ mkdir -p .streamlit
 cp .streamlit/secrets.toml.example .streamlit/secrets.toml
 ```
 
-Then provide the two runtime artifacts described in:
+Then provide the two **required but not tracked** runtime artifacts described in:
 
-- `data/README.md`
-- `checkpoints/README.md`
+- [Metadata table: `data/df_final3.csv`](data/README.md)
+- [Embedding tensor: `checkpoints/deepgcn_node_embeddings.pt`](checkpoints/README.md)
+
+**Without these files, the application stops with an explanatory error.** The stored `node_idx` mapping must match the rows of the embedding tensor. The GitHub OAuth integration additionally requires appropriate secrets in `.streamlit/secrets.toml`.
 
 Run the app with:
 
