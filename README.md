@@ -1,5 +1,16 @@
 # Graph-Based Scientific Paper Recommendation
 
+<div align="center">
+
+![Graph Neural Networks](https://img.shields.io/badge/Graph_Neural_Networks-7C5CFC?style=for-the-badge)
+![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
+![OpenAlex](https://img.shields.io/badge/OpenAlex-129B95?style=for-the-badge)
+
+**From scientific citation graphs to an interactive paper recommender**
+
+</div>
+
 **Graph learning and metadata-aware recommendation over a scientific citation network**
 
 This project studies scientific-paper recommendation by combining graph representations, learned node embeddings and bibliographic metadata. It includes exploratory data mining, classical machine-learning baselines, Graph Neural Network experiments and an interactive Streamlit application.
